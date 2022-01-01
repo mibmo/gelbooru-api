@@ -2,6 +2,11 @@
 name = "gelbooru-api"
 version = "0.1.0"
 edition = "2021"
+license = "MPL-2.0"
+readme = "README.md"
+documentation = "https://docs.rs/gelbooru_api"
+repository = "https://github.com/mibmo/gelbooru-api"
+description = "API for the Gelbooru image board"
 
 [dependencies]
 chrono = "0.4"
