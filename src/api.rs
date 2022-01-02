@@ -556,6 +556,19 @@ impl TagsRequestBuilder {
     }
 }
 
+#[derive(Deserialize, Debug)]
+pub struct Comment {}
+
+impl ApiType for Comment {}
+
+pub async fn comments(client: &Client, post_id: u64) -> Result<Vec<Comment>, Error> {
+        let mut qs: QueryStrings = Default::default();
+        qs.insert("s", "comment".to_string());
+        qs.insert("post_id", post_id.to_string());
+
+        query_api(client, qs).await
+}
+
 // internal function as to DRY
 async fn query_api<T: ApiType>(client: &Client, mut qs: QueryStrings<'_>) -> Result<Vec<T>, Error> {
     if let Some(auth) = &client.auth {
