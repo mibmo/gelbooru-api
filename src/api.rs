@@ -1,3 +1,7 @@
+//! API types and methods
+//!
+//! Use the associated functions at the root module and `RequestBuilder`s to send requests.
+
 use crate::{Client, Error};
 use hyper::body::Buf;
 use serde::Deserialize;
@@ -12,12 +16,7 @@ const API_BASE: &'static str = "https://gelbooru.com/index.php?page=dapi&q=index
 
 type QueryStrings<'a> = HashMap<&'a str, String>;
 
-/*
-use chrono::{offset::FixedOffset, DateTime};
-
-// @TODO: TagType enum
-*/
-
+/// Post on Gelbooru
 #[derive(Deserialize, Debug)]
 pub struct Post {
     pub source: String,
@@ -284,6 +283,7 @@ impl<'a> PostsRequestBuilder<'a> {
     }
 }
 
+/// Tag on Gelbooru
 #[derive(Deserialize, Debug)]
 pub struct Tag {
     pub id: String,
@@ -330,6 +330,7 @@ impl Tag {
     }
 }
 
+/// The type of a tag.
 #[derive(Clone, Copy, Debug)]
 pub enum TagType {
     Artist,
@@ -340,6 +341,7 @@ pub enum TagType {
     Tag,
 }
 
+/// Determines what field sorts tags in a query.
 #[derive(Clone, Copy, Debug)]
 pub enum Ordering {
     Date,

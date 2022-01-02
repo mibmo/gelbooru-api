@@ -1,5 +1,6 @@
 use crate::Error;
 
+/// Credentials for use with API
 #[derive(Clone, Debug)]
 pub struct AuthDetails {
     pub user: usize,
