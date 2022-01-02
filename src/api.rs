@@ -1,6 +1,6 @@
 use crate::{Client, Error};
-use serde::Deserialize;
 use hyper::body::Buf;
+use serde::Deserialize;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::{AsRef, Into};
@@ -435,7 +435,6 @@ async fn query_api<T: ApiType>(client: &Client, mut qs: QueryStrings<'_>) -> Res
         .map(|(query, value)| format!("&{}={}", query, value))
         .collect();
 
-    // error: Error::UriParse(err)
     let uri = format!("{}{}", API_BASE, query_string)
         .parse::<hyper::Uri>()
         .map_err(|err| Error::UriParse(err))?;
