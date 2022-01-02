@@ -19,8 +19,8 @@ pub struct Tag {
 }
 
 // @TODO: TagType enum
-
 */
+
 #[derive(Deserialize, Debug)]
 pub struct Post {
     source: String,
@@ -46,7 +46,6 @@ pub struct Post {
     created_at: String,
     post_locked: u64,
 }
-/*
 
 impl Post {
     pub fn id(&self) -> u64 {
@@ -61,13 +60,19 @@ impl Post {
         self.score
     }
 
-    pub fn created_at(&self) -> DateTime<FixedOffset> {
-        DateTime::parse_from_str(&self.created_at, "%a %b %d %H:%M:%S %z %Y")
-            .expect("failed to parse DateTime. please open an issue")
+    pub fn created_at(&self) -> chrono::DateTime<chrono::offset::FixedOffset> {
+        chrono::DateTime::parse_from_str(&self.created_at, "%a %b %d %H:%M:%S %z %Y")
+            .expect("failed to parse DateTime")
     }
 
-    pub fn rating<'a>(&'a self) -> &'a str {
-        &self.rating
+    pub fn rating<'a>(&'a self) -> crate::Rating {
+        use crate::Rating::*;
+        match &self.rating[0..1] {
+            "s" => Safe,
+            "q" => Questionable,
+            "e" => Explicit,
+            _ => unreachable!("non-standard rating"),
+        }
     }
 
     pub fn owner<'a>(&'a self) -> &'a str {
@@ -90,4 +95,3 @@ impl Post {
         &self.file_url
     }
 }
-*/
