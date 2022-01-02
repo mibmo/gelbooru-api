@@ -10,6 +10,7 @@ description = "API for the Gelbooru image board"
 
 [dependencies]
 chrono = "0.4"
+http = "0.2"
 hyper = "0.14"
 hyper-rustls = "0.23"
 serde = { version = "1", features = ["derive"] }

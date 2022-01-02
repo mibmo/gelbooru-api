@@ -224,7 +224,7 @@ impl<'a> PostsRequestBuilder<'a> {
         // error: Error::UriParse(err)
         let uri = format!("{}post&{}", API_BASE, query_string)
             .parse::<hyper::Uri>()
-            .expect("WHAT THE FUCK");
+            .map_err(|err| Error::UriParse(err))?;
 
         let res = client
             .http_client
@@ -281,4 +281,6 @@ pub enum Error {
     Request(#[from] hyper::Error),
     #[error("an error occured deserializing json response")]
     JsonDeserialize(#[from] serde_json::Error),
+    #[error("could not parse request Uri")]
+    UriParse(#[from] http::uri::InvalidUri),
 }
