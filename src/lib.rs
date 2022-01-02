@@ -113,7 +113,6 @@ impl<'a> PostsRequestBuilder<'a> {
     /// Clears the list of tags to search for.
     /// Tags set using [`tags_raw`](#method.tags_raw) are also cleared.
     ///
-    ///
     /// ## Example
     /// ```rust
     /// # async fn example() -> Result<(), ()> {
@@ -135,13 +134,46 @@ impl<'a> PostsRequestBuilder<'a> {
         self
     }
 
-    /// Filter by ratings
+    /// Filter by content ratings.
+    /// See [`Rating`](enum.rating.html).
+    ///
+    /// ## Example
+    /// ```rust
+    /// # async fn example() -> Result<(), ()> {
+    /// # use gelbooru_api::{Client, Rating, posts};
+    /// # let client = Client::public();
+    /// posts()
+    ///     .tags(&["hatsune_miku"])
+    ///     .rating(Rating::Safe)
+    ///     .send(&client)
+    ///     .await?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn rating(mut self, rating: Rating) -> Self {
         self.rating = Some(rating);
         self
     }
 
-    /// Randomize the order of posts
+    /// Randomize the order of posts.
+    ///
+    /// This is a server-side meta-tag feature, and is only provided for completeness' sake.
+    ///
+    /// ## Example
+    /// ```rust
+    /// # async fn example() -> Result<(), ()> {
+    /// # use gelbooru_api::{Client, Rating, posts};
+    /// # let client = Client::public();
+    /// posts()
+    ///     .tags(&["hatsune_miku"])
+    ///     .random(true)
+    ///     .send(&client)
+    ///     .await?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn random(mut self, random: bool) -> Self {
         self.sort_random = random;
         self
