@@ -26,6 +26,7 @@ for post in posts {
 ```
 
 ### API coverage
+- [x] Authentication
 - [x] Posts
 - [ ] Tags
 - [ ] Comments
