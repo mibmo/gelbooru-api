@@ -2,7 +2,13 @@
 mod test;
 
 pub mod api;
-pub use api::*;
+mod auth;
+mod client;
+mod error;
+use api::*;
+pub use auth::AuthDetails;
+pub use client::Client;
+pub use error::Error;
 
 use hyper::body::Buf;
 use std::borrow::Cow;
@@ -10,58 +16,6 @@ use std::collections::HashMap;
 use std::convert::{AsRef, Into};
 
 const API_BASE: &'static str = "https://gelbooru.com/index.php?page=dapi&q=index&json=1&s=";
-
-type HClient = hyper::Client<hyper_rustls::HttpsConnector<hyper::client::HttpConnector>>;
-
-#[derive(Clone, Debug)]
-pub struct AuthDetails {
-    user: usize,
-    key: String,
-}
-
-impl AuthDetails {
-    pub fn from_query_string(qs: &str) -> Result<Self, Error> {
-        let user_start = qs.find("&user_id=").ok_or(Error::ParseAuth)?;
-        let user_raw = &qs[user_start + 9..];
-        let user = user_raw
-            .parse()
-            .map_err(|err| Error::ParseUserId(err))?;
-        let key = qs[9..user_start].to_string();
-
-        Ok(Self { user, key })
-    }
-}
-
-pub struct Client {
-    http_client: HClient,
-    auth: Option<AuthDetails>,
-}
-
-impl Client {
-    fn base() -> Self {
-        let connector = hyper_rustls::HttpsConnectorBuilder::new()
-            .with_native_roots()
-            .https_only()
-            .enable_http1()
-            .build();
-        let http_client = hyper::Client::builder().build::<_, hyper::Body>(connector);
-
-        Self {
-            http_client,
-            auth: None,
-        }
-    }
-
-    pub fn public() -> Self {
-        Self::base()
-    }
-
-    pub fn with_auth(details: AuthDetails) -> Self {
-        let mut client = Self::base();
-        client.auth = Some(details);
-        client
-    }
-}
 
 /// The content rating of a post.
 ///
@@ -267,20 +221,4 @@ pub fn posts<'a>() -> PostsRequestBuilder<'a> {
         rating: None,
         sort_random: false,
     }
-}
-
-use thiserror::Error;
-
-#[derive(Error, Debug)]
-pub enum Error {
-    #[error("failed to parse authentication query string")]
-    ParseAuth,
-    #[error("could not parse user id")]
-    ParseUserId(std::num::ParseIntError),
-    #[error("request error")]
-    Request(#[from] hyper::Error),
-    #[error("an error occured deserializing json response")]
-    JsonDeserialize(#[from] serde_json::Error),
-    #[error("could not parse request Uri")]
-    UriParse(#[from] http::uri::InvalidUri),
 }
