@@ -413,6 +413,8 @@ impl TagsRequestBuilder {
 
     /// Pull data for the specified tags
     ///
+    /// Tag limit is automatically set to accompany all the names.
+    ///
     /// ## Example
     /// ```rust
     /// # async fn example() -> Result<(), ()> {
@@ -463,9 +465,18 @@ impl TagsRequestBuilder {
         client: &Client,
         search: Option<TagSearch<'_>>,
     ) -> Result<Vec<Tag>, Error> {
+        let limit = self.limit.unwrap_or_else(|| {
+            use TagSearch::*;
+            match &search {
+                Some(Name(_)) => 1,
+                Some(Names(names)) => names.len(),
+                _ => 100,
+            }
+        });
+
         let mut qs: QueryStrings = Default::default();
         qs.insert("s", "tag".to_string());
-        qs.insert("limit", self.limit.unwrap_or(100).to_string());
+        qs.insert("limit", limit.to_string());
 
         if let Some(id) = self.after_id {
             qs.insert("after_id", id.to_string());
