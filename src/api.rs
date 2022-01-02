@@ -556,6 +556,10 @@ impl TagsRequestBuilder {
     }
 }
 
+/*
+ * @TODO: add support for reading XML, since Comments & Deleted Images APIs don't support
+ * outputting in json.
+
 #[derive(Deserialize, Debug)]
 pub struct Comment {}
 
@@ -568,6 +572,7 @@ pub async fn comments(client: &Client, post_id: u64) -> Result<Vec<Comment>, Err
 
         query_api(client, qs).await
 }
+*/
 
 // internal function as to DRY
 async fn query_api<T: ApiType>(client: &Client, mut qs: QueryStrings<'_>) -> Result<Vec<T>, Error> {
