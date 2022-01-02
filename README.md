@@ -30,5 +30,5 @@ for post in posts {
 ### API coverage
 - [x] Authentication
 - [x] Posts
-- [ ] Tags
+- [x] Tags
 - [ ] Comments
