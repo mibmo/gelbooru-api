@@ -347,15 +347,63 @@ impl TagsRequestBuilder {
         self
     }
 
+    /// How tags are sorted.
+    /// _Date, Count, Name._
+    ///
+    /// This is mainly useful with [`send`](#method.send), but ordering works with the other search
+    /// methods as well ([`name`](#method.name), [`names`](#method.names), [`pattern`](#method.pattern))
+    ///
+    /// ## Example
+    /// ```rust
+    /// # async fn example() -> Result<(), ()> {
+    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # let client = Client::public();
+    /// tags()
+    ///     .limit(5)                 // 5 tags
+    ///     .ascending(true)             // descending
+    ///     .order_by(Ordering::Date) // according to creation-time
+    ///     .send(&client)
+    ///     .await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn order_by(mut self, ordering: Ordering) -> Self {
         self.order_by = Some(ordering);
         self
     }
 
+    /// Query for tags without name/pattern specifier.
+    ///
+    /// ## Example
+    /// ```rust
+    /// # async fn example() -> Result<(), ()> {
+    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # let client = Client::public();
+    /// tags()
+    ///     .limit(10)                 // 10 tags
+    ///     .ascending(false)             // descending
+    ///     .order_by(Ordering::Count) // according to count (how many posts have tag)
+    ///     .send(&client)
+    ///     .await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn send(self, client: &Client) -> Result<Vec<Tag>, Error> {
         self.search(client, None).await
     }
 
+    /// Pull data for given tag
+    ///
+    /// ## Example
+    /// ```rust
+    /// # async fn example() -> Result<(), ()> {
+    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # let client = Client::public();
+    /// tags()
+    ///     .name(&client, "solo")
+    ///     .await?;
+    /// # Ok(())
+    /// # }
     pub async fn name<S: AsRef<str>>(self, client: &Client, name: S) -> Result<Option<Tag>, Error> {
         let search = TagSearch::Name(name.as_ref());
         self.search(client, Some(search))
@@ -363,6 +411,18 @@ impl TagsRequestBuilder {
             .map(|tags| tags.into_iter().next())
     }
 
+    /// Pull data for the specified tags
+    ///
+    /// ## Example
+    /// ```rust
+    /// # async fn example() -> Result<(), ()> {
+    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # let client = Client::public();
+    /// tags()
+    ///     .names(&client, &["solo", "hatsune_miku"])
+    ///     .await?;
+    /// # Ok(())
+    /// # }
     pub async fn names<S: AsRef<str>>(
         self,
         client: &Client,
@@ -373,6 +433,22 @@ impl TagsRequestBuilder {
         self.search(client, Some(search)).await
     }
 
+    /// Search for tags with a pattern.
+    ///
+    /// Use `_` for single-character wildcards and `%` for multi-character wildcards.
+    /// (`%choolgirl%` would act as `*choolgirl*` wildcard search)
+    ///
+    /// ## Example
+    /// ```rust
+    /// # async fn example() -> Result<(), ()> {
+    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # let client = Client::public();
+    /// tags()
+    ///     .limit(10)
+    ///     .pattern(&client, "%o_o") // matches regex /.*o.o/
+    ///     .await?;
+    /// # Ok(())
+    /// # }
     pub async fn pattern<S: AsRef<str>>(
         self,
         client: &Client,
@@ -424,6 +500,7 @@ impl TagsRequestBuilder {
     }
 }
 
+// internal function as to DRY
 async fn query_api<T: ApiType>(client: &Client, mut qs: QueryStrings<'_>) -> Result<Vec<T>, Error> {
     if let Some(auth) = &client.auth {
         qs.insert("user_id", auth.user.to_string());
