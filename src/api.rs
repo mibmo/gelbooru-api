@@ -134,8 +134,8 @@ impl<'a> PostsRequestBuilder<'a> {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, posts};
+    /// # use gelbooru_api::{Client, Error, posts};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// posts()
     ///     .tag("hello")
@@ -159,8 +159,8 @@ impl<'a> PostsRequestBuilder<'a> {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, posts};
+    /// # use gelbooru_api::{Client, Error, posts};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// posts()
     ///     .tags(&["hello", "world"])
@@ -196,8 +196,8 @@ impl<'a> PostsRequestBuilder<'a> {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, posts};
+    /// # use gelbooru_api::{Client, Error, posts};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// posts()
     ///     .tags(&["herro", "world"])
@@ -205,7 +205,6 @@ impl<'a> PostsRequestBuilder<'a> {
     ///     .tags(&["hello", "world"])
     ///     .send(&client)
     ///     .await?;
-    ///
     /// # Ok(())
     /// # }
     /// ```
@@ -220,8 +219,8 @@ impl<'a> PostsRequestBuilder<'a> {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, Rating, posts};
+    /// # use gelbooru_api::{Client, Error, Rating, posts};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// posts()
     ///     .tags(&["hatsune_miku"])
@@ -243,8 +242,8 @@ impl<'a> PostsRequestBuilder<'a> {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, Rating, posts};
+    /// # use gelbooru_api::{Client, Error, Rating, posts};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// posts()
     ///     .tags(&["hatsune_miku"])
@@ -402,8 +401,8 @@ impl TagsRequestBuilder {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # use gelbooru_api::{Client, Error, Ordering, tags};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// tags()
     ///     .limit(5)                 // 5 tags
@@ -423,8 +422,8 @@ impl TagsRequestBuilder {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # use gelbooru_api::{Client, Error, Ordering, tags};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// tags()
     ///     .limit(10)                 // 10 tags
@@ -443,8 +442,8 @@ impl TagsRequestBuilder {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # use gelbooru_api::{Client, Error, Ordering, tags};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// tags()
     ///     .name(&client, "solo")
@@ -464,8 +463,8 @@ impl TagsRequestBuilder {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # use gelbooru_api::{Client, Error, Ordering, tags};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// tags()
     ///     .names(&client, &["solo", "hatsune_miku"])
@@ -489,8 +488,8 @@ impl TagsRequestBuilder {
     ///
     /// ## Example
     /// ```rust
-    /// # async fn example() -> Result<(), ()> {
-    /// # use gelbooru_api::{Client, Ordering, tags};
+    /// # use gelbooru_api::{Client, Error, Ordering, tags};
+    /// # async fn example() -> Result<(), Error> {
     /// # let client = Client::public();
     /// tags()
     ///     .limit(10)

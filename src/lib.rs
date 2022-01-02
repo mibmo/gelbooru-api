@@ -15,8 +15,8 @@ pub use error::Error;
 ///
 /// ## Example
 /// ```rust
-/// # async fn example() -> Result<(), ()> {
-/// # use gelbooru_api::{Client, Rating, posts};
+/// # use gelbooru_api::{Client, Error, Rating, posts};
+/// # async fn example() -> Result<(), Error> {
 /// let client = Client::public();
 ///
 /// posts()
@@ -43,8 +43,8 @@ pub fn posts<'a>() -> api::PostsRequestBuilder<'a> {
 ///
 /// ## Example
 /// ```rust
-/// # async fn example() -> Result<(), ()> {
-/// # use gelbooru_api::{Client, Ordering, tags};
+/// # use gelbooru_api::{Client, Error, Ordering, tags};
+/// # async fn example() -> Result<(), Error> {
 /// let client = Client::public();
 ///
 /// tags()
