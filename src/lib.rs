@@ -5,7 +5,7 @@ pub mod api;
 mod auth;
 mod client;
 mod error;
-pub use api::Rating;
+pub use api::{Rating, Ordering};
 pub use auth::AuthDetails;
 pub use client::Client;
 pub use error::Error;
