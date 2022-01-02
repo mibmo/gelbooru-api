@@ -1,8 +1,7 @@
-#![allow(dead_code)]
-
-use chrono::{offset::FixedOffset, DateTime};
 use serde::Deserialize;
 
+/*
+use chrono::{offset::FixedOffset, DateTime};
 #[derive(Clone, Copy, Debug)]
 pub enum Ordering {
     Date,
@@ -21,31 +20,33 @@ pub struct Tag {
 
 // @TODO: TagType enum
 
+*/
 #[derive(Deserialize, Debug)]
 pub struct Post {
-    pub source: String,
-    pub directory: String,
-    pub hash: String,
-    pub height: u64,
-    pub id: u64,
-    pub image: String,
-    pub change: u64,
-    pub owner: String,
-    pub parent_id: Option<u64>,
-    pub rating: String,
-    pub sample: u64,
-    pub preview_height: u64,
-    pub preview_width: u64,
-    pub sample_height: u64,
-    pub sample_width: u64,
-    pub score: u64,
-    pub tags: String,
-    pub title: String,
-    pub width: u64,
-    pub file_url: String,
-    pub created_at: String,
-    pub post_locked: u64,
+    source: String,
+    directory: String,
+    hash: String,
+    height: u64,
+    id: u64,
+    image: String,
+    change: u64,
+    owner: String,
+    parent_id: Option<u64>,
+    rating: String,
+    sample: u64,
+    preview_height: u64,
+    preview_width: u64,
+    sample_height: u64,
+    sample_width: u64,
+    score: u64,
+    tags: String,
+    title: String,
+    width: u64,
+    file_url: String,
+    created_at: String,
+    post_locked: u64,
 }
+/*
 
 impl Post {
     pub fn id(&self) -> u64 {
@@ -89,3 +90,4 @@ impl Post {
         &self.file_url
     }
 }
+*/
