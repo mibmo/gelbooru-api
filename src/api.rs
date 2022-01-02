@@ -14,21 +14,6 @@ type QueryStrings<'a> = HashMap<&'a str, String>;
 
 /*
 use chrono::{offset::FixedOffset, DateTime};
-#[derive(Clone, Copy, Debug)]
-pub enum Ordering {
-    Date,
-    Count,
-    Name,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Tag {
-    pub id: u64,
-    pub tag: String,
-    pub count: u64,
-    pub r#type: String,
-    pub ambiguous: u64,
-}
 
 // @TODO: TagType enum
 */
@@ -294,6 +279,146 @@ impl<'a> PostsRequestBuilder<'a> {
         qs.insert("s", "post".to_string());
         qs.insert("limit", self.limit.unwrap_or(100).to_string());
         qs.insert("tags", tags);
+
+        query_api(client, qs).await
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Tag {
+    pub id: String,
+    pub tag: String,
+    pub count: String,
+    pub r#type: String,
+    pub ambiguous: String,
+}
+
+impl ApiType for Tag {}
+
+#[derive(Clone, Copy, Debug)]
+pub enum Ordering {
+    Date,
+    Count,
+    Name,
+}
+
+/// Request builder for the Tags endpoint.
+///
+/// See the [`tags`](fn.tags.html) function for proper usage.
+#[derive(Clone, Debug)]
+pub struct TagsRequestBuilder {
+    limit: Option<usize>,
+    after_id: Option<usize>,
+    order_by: Option<Ordering>,
+    ascending: Option<bool>,
+}
+
+enum TagSearch<'a> {
+    Name(&'a str),
+    Names(Vec<&'a str>),
+    Pattern(&'a str),
+}
+
+impl TagsRequestBuilder {
+    pub(crate) fn new() -> Self {
+        Self {
+            limit: None,
+            after_id: None,
+            order_by: None,
+            ascending: None,
+        }
+    }
+
+    /// Amount of tags to recieve.
+    ///
+    /// When unspecified, default limit is 100, as set by the server.
+    pub fn limit(mut self, limit: usize) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+
+    pub fn after_id(mut self, id: usize) -> Self {
+        self.after_id = Some(id);
+        self
+    }
+
+    pub fn ascending(mut self, ascending: bool) -> Self {
+        self.ascending = Some(ascending);
+        self
+    }
+
+    pub fn order_by(mut self, ordering: Ordering) -> Self {
+        self.order_by = Some(ordering);
+        self
+    }
+
+    pub async fn send(self, client: &Client) -> Result<Vec<Tag>, Error> {
+        self.search(client, None).await
+    }
+
+    pub async fn name<S: AsRef<str>>(self, client: &Client, name: S) -> Result<Option<Tag>, Error> {
+        let search = TagSearch::Name(name.as_ref());
+        self.search(client, Some(search))
+            .await
+            .map(|tags| tags.into_iter().next())
+    }
+
+    pub async fn names<S: AsRef<str>>(
+        self,
+        client: &Client,
+        names: &[S],
+    ) -> Result<Vec<Tag>, Error> {
+        let names = names.iter().map(|name| name.as_ref()).collect();
+        let search = TagSearch::Names(names);
+        self.search(client, Some(search)).await
+    }
+
+    pub async fn pattern<S: AsRef<str>>(
+        self,
+        client: &Client,
+        pattern: S,
+    ) -> Result<Vec<Tag>, Error> {
+        let search = TagSearch::Pattern(pattern.as_ref());
+        self.search(client, Some(search)).await
+    }
+
+    async fn search(
+        self,
+        client: &Client,
+        search: Option<TagSearch<'_>>,
+    ) -> Result<Vec<Tag>, Error> {
+        let mut qs: QueryStrings = Default::default();
+        qs.insert("s", "tag".to_string());
+        qs.insert("limit", self.limit.unwrap_or(100).to_string());
+
+        if let Some(id) = self.after_id {
+            qs.insert("after_id", id.to_string());
+        }
+
+        if let Some(ordering) = self.order_by {
+            use Ordering::*;
+            let order_by = match ordering {
+                Date => "date",
+                Count => "count",
+                Name => "name",
+            }
+            .to_string();
+            qs.insert("order_by", order_by);
+        }
+
+        if let Some(ascending) = self.ascending {
+            qs.insert("order", if ascending { "ASC" } else { "DESC" }.to_string());
+        }
+
+        if let Some(search) = search {
+            use TagSearch::*;
+            let (mode, mode_value) = match search {
+                Name(name) => ("name", name.to_string()),
+                Names(names) => ("names", names.join("+")),
+                Pattern(pattern) => ("name_pattern", pattern.to_string()),
+            };
+            qs.insert(mode, mode_value);
+        }
 
         query_api(client, qs).await
     }

@@ -37,3 +37,7 @@ pub fn posts<'a>() -> api::PostsRequestBuilder<'a> {
         sort_random: false,
     }
 }
+
+pub fn tags() -> api::TagsRequestBuilder {
+    api::TagsRequestBuilder::new()
+}
