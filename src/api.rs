@@ -295,6 +295,51 @@ pub struct Tag {
 
 impl ApiType for Tag {}
 
+impl Tag {
+    pub fn id(&self) -> u64 {
+        self.id.parse().expect("tag's ID not a number")
+    }
+
+    pub fn tag<'a>(&'a self) -> &'a str {
+        &self.tag
+    }
+
+    pub fn count(&self) -> u64 {
+        self.count.parse().expect("tag's count not a number")
+    }
+
+    pub fn tag_type(&self) -> TagType {
+        use TagType::*;
+        match self.r#type.as_str() {
+            "artist" => Artist,
+            "character" => Character,
+            "copyright" => Copyright,
+            "deprecated" => Deprecated,
+            "metadata" => Metadata,
+            "tag" => Tag,
+            _ => unreachable!("non-standard tag type"),
+        }
+    }
+
+    pub fn ambigious(&self) -> bool {
+        if self.ambiguous == "0" {
+            false
+        } else {
+            true
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum TagType {
+    Artist,
+    Character,
+    Copyright,
+    Deprecated,
+    Metadata,
+    Tag,
+}
+
 #[derive(Clone, Copy, Debug)]
 pub enum Ordering {
     Date,
