@@ -195,7 +195,7 @@ impl<'a> PostsRequestBuilder<'a> {
     }
 }
 
-/// Gateway to the Posts api
+/// Gateway to interacting with the Posts API
 ///
 /// ## Example
 /// ```rust
