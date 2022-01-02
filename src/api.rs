@@ -403,7 +403,7 @@ impl TagsRequestBuilder {
                 Name => "name",
             }
             .to_string();
-            qs.insert("order_by", order_by);
+            qs.insert("orderby", order_by);
         }
 
         if let Some(ascending) = self.ascending {
