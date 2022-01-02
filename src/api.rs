@@ -290,36 +290,39 @@ impl<'a> PostsRequestBuilder<'a> {
             tags.push_str(&self.tags_raw);
         }
 
-        let mut query_map: QueryStrings = Default::default();
-        query_map.insert("limit", self.limit.unwrap_or(100).to_string());
-        query_map.insert("tags", tags);
+        let mut qs: QueryStrings = Default::default();
+        qs.insert("s", "post".to_string());
+        qs.insert("limit", self.limit.unwrap_or(100).to_string());
+        qs.insert("tags", tags);
 
-        if let Some(auth) = &client.auth {
-            query_map.insert("user_id", auth.user.to_string());
-            query_map.insert("api_key", auth.key.clone());
-        }
-
-        let query_string: String = query_map
-            .iter()
-            .map(|(query, value)| format!("{}={}&", query, value))
-            .collect();
-    
-        // error: Error::UriParse(err)
-        let uri = format!("{}post&{}", API_BASE, query_string)
-            .parse::<hyper::Uri>()
-            .map_err(|err| Error::UriParse(err))?;
-    
-        let res = client
-            .http_client
-            .get(uri)
-            .await
-            .map_err(|err| Error::Request(err))?;
-        let body = hyper::body::aggregate(res)
-            .await
-            .map_err(|err| Error::Request(err))?;
-        let posts: Vec<Post> =
-            serde_json::from_reader(body.reader()).map_err(|err| Error::JsonDeserialize(err))?;
-
-         Ok(posts)
+        query_api(client, qs).await
     }
+}
+
+async fn query_api<T: ApiType>(client: &Client, mut qs: QueryStrings<'_>) -> Result<Vec<T>, Error> {
+    if let Some(auth) = &client.auth {
+        qs.insert("user_id", auth.user.to_string());
+        qs.insert("api_key", auth.key.clone());
+    }
+
+    let query_string: String = qs
+        .iter()
+        .map(|(query, value)| format!("&{}={}", query, value))
+        .collect();
+
+    // error: Error::UriParse(err)
+    let uri = format!("{}{}", API_BASE, query_string)
+        .parse::<hyper::Uri>()
+        .map_err(|err| Error::UriParse(err))?;
+
+    let res = client
+        .http_client
+        .get(uri)
+        .await
+        .map_err(|err| Error::Request(err))?;
+    let body = hyper::body::aggregate(res)
+        .await
+        .map_err(|err| Error::Request(err))?;
+
+    serde_json::from_reader(body.reader()).map_err(|err| Error::JsonDeserialize(err))
 }
