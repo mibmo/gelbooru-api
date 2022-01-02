@@ -5,7 +5,7 @@ pub mod api;
 mod auth;
 mod client;
 mod error;
-pub use api::{Rating, Ordering};
+pub use api::{Rating, Ordering, TagType};
 //pub use api::{comments};
 pub use auth::AuthDetails;
 pub use client::Client;
