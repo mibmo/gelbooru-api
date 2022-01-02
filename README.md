@@ -1,4 +1,6 @@
 # Gelbooru API
+[![Crates.io](https://img.shields.io/crates/v/gelbooru-api)](https://crates.io/crates/gelbooru-api)
+
 Rudimentary Gelbooru API.
 
 ### Usage
