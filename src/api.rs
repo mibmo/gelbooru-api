@@ -63,7 +63,7 @@ impl Post {
             .expect("failed to parse DateTime")
     }
 
-    pub fn rating<'a>(&'a self) -> crate::Rating {
+    pub fn rating<'a>(&'a self) -> Rating {
         use crate::Rating::*;
         match &self.rating[0..1] {
             "s" => Safe,
@@ -101,7 +101,7 @@ impl Post {
 /// The content rating of a post.
 ///
 /// See [this forum post](https://gelbooru.com/index.php?page=wiki&s=view&id=2535) for an in-depth explanation of the 3 ratings.
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Rating {
     Safe,
     Questionable,
@@ -330,7 +330,7 @@ impl Tag {
 }
 
 /// The type of a tag.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TagType {
     Artist,
     Character,
@@ -341,7 +341,7 @@ pub enum TagType {
 }
 
 /// Determines what field sorts tags in a query.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Ordering {
     Date,
     Count,
