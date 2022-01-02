@@ -38,6 +38,21 @@ pub fn posts<'a>() -> api::PostsRequestBuilder<'a> {
     }
 }
 
+/// Gateway to interacting with the Tags API
+///
+/// ## Example
+/// ```rust
+/// # async fn example() -> Result<(), ()> {
+/// # use gelbooru_api::{Client, Ordering, tags};
+/// let client = Client::public();
+///
+/// tags()
+///     .limit(5)
+///     .pattern(&client, "_ol_")
+///     .await?;
+/// # Ok(())
+/// # }
+/// ```
 pub fn tags() -> api::TagsRequestBuilder {
     api::TagsRequestBuilder::new()
 }
