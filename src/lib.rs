@@ -13,9 +13,28 @@ const API_BASE: &'static str = "https://gelbooru.com/index.php?page=dapi&q=index
 
 type HClient = hyper::Client<hyper_rustls::HttpsConnector<hyper::client::HttpConnector>>;
 
+#[derive(Clone, Debug)]
+pub struct AuthDetails {
+    user: usize,
+    key: String,
+}
+
+impl AuthDetails {
+    pub fn from_query_string(qs: &str) -> Result<Self, Error> {
+        let user_start = qs.find("&user_id=").ok_or(Error::ParseAuth)?;
+        let user_raw = &qs[user_start + 9..];
+        let user = user_raw
+            .parse()
+            .map_err(|err| Error::ParseUserId(err))?;
+        let key = qs[9..user_start].to_string();
+
+        Ok(Self { user, key })
+    }
+}
+
 pub struct Client {
     http_client: HClient,
-    auth: Option<()>,
+    auth: Option<AuthDetails>,
 }
 
 impl Client {
@@ -37,9 +56,9 @@ impl Client {
         Self::base()
     }
 
-    pub fn with_auth() -> Self {
+    pub fn with_auth(details: AuthDetails) -> Self {
         let mut client = Self::base();
-        client.auth = Some(());
+        client.auth = Some(details);
         client
     }
 }
@@ -192,6 +211,11 @@ impl<'a> PostsRequestBuilder<'a> {
         query_map.insert("limit", self.limit.unwrap_or(100).to_string());
         query_map.insert("tags", tags);
 
+        if let Some(auth) = &client.auth {
+            query_map.insert("user_id", auth.user.to_string());
+            query_map.insert("api_key", auth.key.clone());
+        }
+
         let query_string: String = query_map
             .iter()
             .map(|(query, value)| format!("{}={}&", query, value))
@@ -249,10 +273,10 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    //#[error("could not parse date time")]
-    //DateTimeParse(#[from] chrono::format::ParseError),
-    //#[error("could not parse query string")]
-    //AuthParse(Option<std::num::ParseIntError>),
+    #[error("failed to parse authentication query string")]
+    ParseAuth,
+    #[error("could not parse user id")]
+    ParseUserId(std::num::ParseIntError),
     #[error("request error")]
     Request(#[from] hyper::Error),
     #[error("an error occured deserializing json response")]
