@@ -31,4 +31,5 @@ for post in posts {
 - [x] Authentication
 - [x] Posts
 - [x] Tags
+- [ ] Users
 - [ ] Comments
