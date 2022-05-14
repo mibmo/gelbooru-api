@@ -1,4 +1,4 @@
-#[cfg(tests)]
+#[cfg(test)]
 mod test;
 
 pub mod api;
