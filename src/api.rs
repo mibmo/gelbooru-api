@@ -303,43 +303,49 @@ impl<'a> PostsRequestBuilder<'a> {
 /// Tag on Gelbooru
 #[derive(Deserialize, Debug)]
 pub struct Tag {
-    pub id: String,
-    pub tag: String,
-    pub count: String,
-    pub r#type: String,
-    pub ambiguous: String,
+    pub id: u64,
+    pub name: String,
+    pub count: u64,
+    #[serde(rename = "type")]
+    pub tag_type: u64,
+    pub ambiguous: u64,
 }
 
 impl ApiQuery for TagQuery {}
 
 impl Tag {
     pub fn id(&self) -> u64 {
-        self.id.parse().expect("tag's ID not a number")
+        self.id
     }
 
+    #[deprecated(since="0.3.5", note="Use tag.name() instead")]
     pub fn tag<'a>(&'a self) -> &'a str {
-        &self.tag
+        &self.name()
+    }
+
+    pub fn name<'a>(&'a self) -> &'a str {
+        &self.name
     }
 
     pub fn count(&self) -> u64 {
-        self.count.parse().expect("tag's count not a number")
+        self.count
     }
 
     pub fn tag_type(&self) -> TagType {
         use TagType::*;
-        match self.r#type.as_str() {
-            "artist" => Artist,
-            "character" => Character,
-            "copyright" => Copyright,
-            "deprecated" => Deprecated,
-            "metadata" => Metadata,
-            "tag" => Tag,
+        match self.tag_type {
+            1 => Artist,
+            4 => Character,
+            3 => Copyright,
+            2 => Deprecated,
+            5 => Metadata,
+            0 => Tag,
             _ => unreachable!("non-standard tag type"),
         }
     }
 
     pub fn ambigious(&self) -> bool {
-        if self.ambiguous == "0" {
+        if self.ambiguous == 0 {
             false
         } else {
             true
