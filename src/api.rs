@@ -21,7 +21,6 @@ type QueryStrings<'a> = HashMap<&'a str, String>;
 pub struct Post {
     pub source: String,
     pub directory: String,
-    pub hash: String,
     pub height: u64,
     pub id: u64,
     pub image: String,
@@ -83,10 +82,6 @@ impl Post {
 
     pub fn dimensions(&self) -> (u64, u64) {
         (self.width, self.height)
-    }
-
-    pub fn hash<'a>(&'a self) -> &'a str {
-        &self.hash
     }
 
     pub fn image_url<'a>(&'a self) -> &'a str {
