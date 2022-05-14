@@ -10,18 +10,40 @@ use std::collections::HashMap;
 use std::convert::{AsRef, Into};
 
 // marker trait for API types
-trait ApiType: serde::de::DeserializeOwned {}
+trait ApiQuery: serde::de::DeserializeOwned {}
 
 const API_BASE: &'static str = "https://gelbooru.com/index.php?page=dapi&q=index&json=1";
 
 type QueryStrings<'a> = HashMap<&'a str, String>;
+
+#[derive(Deserialize, Debug)]
+pub struct Attributes {
+    pub limit: usize,
+    pub offset: usize,
+    pub count: usize,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct PostQuery {
+    #[serde(rename = "@attributes")]
+    pub attributes: Attributes,
+    #[serde(rename = "post", default = "Vec::new")]
+    pub posts: Vec<Post>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct TagQuery {
+    #[serde(rename = "@attributes")]
+    pub attributes: Attributes,
+    #[serde(rename = "tag", default = "Vec::new")]
+    pub tags: Vec<Tag>,
+}
 
 /// Post on Gelbooru
 #[derive(Deserialize, Debug)]
 pub struct Post {
     pub source: String,
     pub directory: String,
-    pub hash: String,
     pub height: u64,
     pub id: u64,
     pub image: String,
@@ -43,7 +65,7 @@ pub struct Post {
     pub post_locked: u64,
 }
 
-impl ApiType for Post {}
+impl ApiQuery for PostQuery {}
 
 impl Post {
     pub fn id(&self) -> u64 {
@@ -83,10 +105,6 @@ impl Post {
 
     pub fn dimensions(&self) -> (u64, u64) {
         (self.width, self.height)
-    }
-
-    pub fn hash<'a>(&'a self) -> &'a str {
-        &self.hash
     }
 
     pub fn image_url<'a>(&'a self) -> &'a str {
@@ -259,7 +277,7 @@ impl<'a> PostsRequestBuilder<'a> {
         self
     }
 
-    pub async fn send(self, client: &Client) -> Result<Vec<Post>, Error> {
+    pub async fn send(self, client: &Client) -> Result<PostQuery, Error> {
         let mut tags = String::new();
         if let Some(rating) = self.rating {
             tags.push_str(&format!("rating:{:?}+", rating).to_lowercase());
@@ -292,7 +310,7 @@ pub struct Tag {
     pub ambiguous: String,
 }
 
-impl ApiType for Tag {}
+impl ApiQuery for TagQuery {}
 
 impl Tag {
     pub fn id(&self) -> u64 {
@@ -434,7 +452,7 @@ impl TagsRequestBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn send(self, client: &Client) -> Result<Vec<Tag>, Error> {
+    pub async fn send(self, client: &Client) -> Result<TagQuery, Error> {
         self.search(client, None).await
     }
 
@@ -454,7 +472,7 @@ impl TagsRequestBuilder {
         let search = TagSearch::Name(name.as_ref());
         self.search(client, Some(search))
             .await
-            .map(|tags| tags.into_iter().next())
+            .map(|tags| tags.tags.into_iter().next())
     }
 
     /// Pull data for the specified tags
@@ -475,7 +493,7 @@ impl TagsRequestBuilder {
         self,
         client: &Client,
         names: &[S],
-    ) -> Result<Vec<Tag>, Error> {
+    ) -> Result<TagQuery, Error> {
         let names = names.iter().map(|name| name.as_ref()).collect();
         let search = TagSearch::Names(names);
         self.search(client, Some(search)).await
@@ -501,7 +519,7 @@ impl TagsRequestBuilder {
         self,
         client: &Client,
         pattern: S,
-    ) -> Result<Vec<Tag>, Error> {
+    ) -> Result<TagQuery, Error> {
         let search = TagSearch::Pattern(pattern.as_ref());
         self.search(client, Some(search)).await
     }
@@ -510,7 +528,7 @@ impl TagsRequestBuilder {
         self,
         client: &Client,
         search: Option<TagSearch<'_>>,
-    ) -> Result<Vec<Tag>, Error> {
+    ) -> Result<TagQuery, Error> {
         let limit = self.limit.unwrap_or_else(|| {
             use TagSearch::*;
             match &search {
@@ -576,7 +594,7 @@ pub async fn comments(client: &Client, post_id: u64) -> Result<Vec<Comment>, Err
 */
 
 // internal function as to DRY
-async fn query_api<T: ApiType>(client: &Client, mut qs: QueryStrings<'_>) -> Result<Vec<T>, Error> {
+async fn query_api<T: ApiQuery>(client: &Client, mut qs: QueryStrings<'_>) -> Result<T, Error> {
     if let Some(auth) = &client.auth {
         qs.insert("user_id", auth.user.to_string());
         qs.insert("api_key", auth.key.clone());
