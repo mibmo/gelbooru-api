@@ -1,31 +1,15 @@
+[docs]: https://docs.rs/gelbooru-api
+[crates]: https://crates.io/crates/gelbooru-api
+
 # Gelbooru API
-[![Crates.io](https://img.shields.io/crates/v/gelbooru-api)](https://crates.io/crates/gelbooru-api)
+[![Crates.io](https://img.shields.io/docsrs/gelbooru-api)][docs]
+[![Crates.io](https://img.shields.io/crates/v/gelbooru-api)][crates]
 
 Rudimentary Gelbooru API.
 
 ### Usage
-Fetch latest 20 Safe-rated posts with tags `solo` and `hatsune_miku`.
-```rust
-use gelbooru_api::{Client, Rating, posts};
-
-let client = Client::public();
-let posts = posts()
-	.limit(20)
-	.rating(Rating::Safe)
-	.tags(&["solo", "hatsune_miku"])
-	.send(&client)
-	.await?;
-
-for post in posts {
-	println!(
-		"Post {id} created at {created_at} by {owner} [{image_url}]",
-		id = post.id(),
-		created_at = post.created_at(),
-		owner = post.owner(),
-		image_url = post.image_url(),
-	);
-}
-```
+The API interface aims to be extremely simple to use.
+Go check out the `examples/` folder or [**RTFM**][docs].
 
 ### API coverage
 - [x] Authentication
