@@ -344,7 +344,12 @@ impl Tag {
         }
     }
 
+    #[deprecated(since="0.3.5", note="Use tag.ambiguous() instead")]
     pub fn ambigious(&self) -> bool {
+        self.ambiguous()
+    }
+
+    pub fn ambiguous(&self) -> bool {
         if self.ambiguous == 0 {
             false
         } else {

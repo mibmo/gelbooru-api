@@ -13,12 +13,12 @@ async fn main() -> EResult<()> {
 
     for tag in tags.tags {
         println!(
-            "Tag {name:25} [{id:06}] count {count:7} of type {tag_type:?}, ambigious: {ambigious}",
+            "Tag {name:25} [{id:06}] count {count:7} of type {tag_type:?}, ambiguous: {ambiguous}",
             id = tag.id(),
             name = tag.name(),
             count = tag.count(),
             tag_type = tag.tag_type(),
-            ambigious = tag.ambigious(),
+            ambiguous = tag.ambiguous(),
         );
     }
 
